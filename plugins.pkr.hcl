@@ -5,10 +5,10 @@ packer {
       version = ">= 0.0.1"
       source  = "github.com/hashicorp/virtualbox"
     }
-    vagrant = {
+    /*vagrant = {
       version = ">= 1.0.2"
       source  = "github.com/hashicorp/vagrant"
-    }
+    }*/
     vsphere = {
       version = ">= 1.1.1"
       source  = "github.com/hashicorp/vsphere"
@@ -17,7 +17,7 @@ packer {
       version = ">= 1.0.8"
       source  = "github.com/hashicorp/vmware"
     }
-    proxmox = {
+    /*proxmox = {
       version = ">= 1.1.3"
       source  = "github.com/hashicorp/proxmox"
     }
@@ -48,7 +48,7 @@ packer {
     googlecompute = {
       version = ">= 1.1.1"
       source  = "github.com/hashicorp/googlecompute"
-    }
+    }*/
     digitalocean = {
       version = ">= 1.0.4"
       source  = "github.com/digitalocean/digitalocean"
@@ -56,10 +56,10 @@ packer {
     azure = {
       version = ">= 1.4.2"
       source  = "github.com/digitalocean/azure"
-    }
+    } /*
     amazon = {
       version = ">= 1.2.5"
       source  = "github.com/digitalocean/amazon"
-    }
+    }*/
   }
 }

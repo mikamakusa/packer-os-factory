@@ -1,83 +1,100 @@
-source "hyperv-iso" "template" {
-  iso_checksum          = var.iso_checksum
-  iso_url               = var.iso_url
-  output_directory      = join("-", [local.output_directory, "hyperv"])
-  disable_shutdown      = bool
-  disk_size = number
-  use_legacy_network_adapter = bool
-  differencing_disk = bool
-  use_fixed_vhd_format = bool
-  disk_block_size = number
-  memory = number
-  secondary_iso_images = list(string)
-  disk_additional_size = list(number)
-  guest_additions_mode = string
-  guest_additions_path = string
-  vm_name = local.vm_name
-  switch_name = string
-  switch_vlan_id = string
-  mac_address = string
-  vlan_id = string
-  cpus = number
-  generation = number
-  enable_mac_spoofing = bool
-  enable_dynamic_memory = bool
-  enable_secure_boot = bool
-  secure_boot_template = string
-  enable_virtualization_extensions = bool
-  temp_path = string
-  configuration_version = string
-  keep_registered = bool
-  skip_compaction = bool
-  skip_export = bool
-  headless = bool
-  firs_boot_device = string
-  boot_order = list(string)
-  http_directory            = var.vm_http_directory
-  http_content              = var.common_data_source == "http" ? local.data_source_content : null
-  http_port_min             = var.common_data_source == "http" ? var.vm_http_port_min : null
-  http_port_max             = var.common_data_source == "http" ? var.vm_http_port_max : null
-  http_bind_address         = var.common_data_source == "http" ? var.vm_http_bind_address : null
-  floppy_files              = var.vm_floppy_files
-  floppy_dirs               = var.vm_floppy_dirs
-  floppy_content            = var.vm_floppy_content
-  floppy_label              = var.vm_floppy_label
-  cd_files                  = var.vm_cd_files
-  cd_label                  = var.vm_cd_label
-  cd_content                = var.common_data_source == "disk" ? local.data_source_content : null
-  shutdown_command      = local.shutdown_command
-  shutdown_timeout      = var.shutdown_timeout
-  communicator = var.is_windows ? "winrm" : "ssh"
-}
-
 source "vsphere-iso" "template" {
-  enable_dynamic_memory = local.hyperv_enable_dynamic_memory
-  enable_secure_boot    = local.hyperv_enable_secure_boot
-  generation            = var.hyperv_generation
-  guest_additions_mode  = var.hyperv_guest_additions_mode
-  switch_name           = var.hyperv_switch_name
-  boot_command          = var.boot_command
-  boot_wait             = local.boot_wait
-  cpus                  = var.cpus
-  communicator          = local.communicator
-  disk_size             = var.disk_size
-  floppy_files          = local.floppy_files
-  headless              = var.headless
-  http_directory        = local.http_directory
-  iso_checksum          = var.iso_checksum
-  iso_url               = var.iso_url
-  memory                = local.memory
-  output_directory      = join("-", [local.output_directory, "hyperv"])
-  shutdown_command      = local.shutdown_command
-  shutdown_timeout      = var.shutdown_timeout
-  ssh_password          = var.ssh_password
-  ssh_port              = var.ssh_port
-  ssh_timeout           = var.ssh_timeout
-  ssh_username          = var.ssh_username
-  winrm_password        = var.winrm_password
-  winrm_timeout         = var.winrm_timeout
-  winrm_username        = var.winrm_username
-  vm_name               = local.vm_name
+  vcenter_server       = var.vm_vsphere_endpoint
+  host                 = var.vm_vsphere_host
+  resource_pool        = var.vm_vsphere_resource_pool
+  username             = var.vm_vsphere_username
+  password             = var.vm_vsphere_password
+  insecure_connection  = var.vm_vsphere_insecure_connection
+  datacenter           = var.vm_vsphere_datacenter
+  cluster              = var.vm_vsphere_cluster
+  datastore            = var.vm_vsphere_datastore
+  folder               = var.vm_vsphere_folder
+  vm_name              = local.vm_name
+  guest_os_type        = var.vm_guest_os_type
+  firmware             = var.vm_firmware
+  CPUs                 = var.vm_cpu_count
+  cpu_cores            = var.vm_cpu_cores
+  CPU_hot_plug         = var.vm_cpu_hot_add
+  RAM                  = var.vm_mem_size
+  RAM_hot_plug         = var.vm_mem_hot_add
+  cdrom_type           = var.vm_cdrom_type
+  disk_controller_type = ["lsilogic-sas"]
+  vm_version           = var.common_vm_version
+  remove_cdrom         = var.common_remove_cdrom
+  tools_upgrade_policy = var.common_tools_upgrade_policy
+  iso_paths            = local.iso_paths
+  iso_checksum         = local.iso_checksum
+  cd_files = var.is_windows ? [
+    join("/", [path.root, "datas", "autounattend.xml"]),
+    ] : [
+    join("/", [path.root, "datas", "kickstart.cfg"])
+  ]
+  floppy_files = var.is_windows ? [
+    join("/", [path.root, "scripts", "windows", "initial-setup.ps1"])
+  ] : null
+  boot_order          = var.vm_boot_order
+  boot_wait           = var.vm_boot_wait
+  ip_wait_timeout     = var.common_ip_wait_timeout
+  shutdown_command    = var.is_windows == true ? "shutdown -s -t 0 -f" : "echo 'Packer Shutdown' | sudo -S /sbin/halt -h -p"
+  shutdown_timeout    = var.common_shutdown_timeout
+  communicator        = var.vm_communicator != "none" ? (var.is_windows ? "winrm" : "ssh") : var.vm_communicator
+  ssh_proxy_host      = var.is_windows ? null : var.communicator_proxy_host
+  ssh_proxy_port      = var.is_windows ? null : var.communicator_proxy_port
+  ssh_proxy_username  = var.is_windows ? null : var.communicator_proxy_username
+  ssh_proxy_password  = var.is_windows ? null : var.communicator_proxy_password
+  ssh_username        = var.is_windows ? null : var.build_username
+  ssh_password        = var.is_windows ? null : var.build_password
+  ssh_port            = var.is_windows ? null : var.communicator_port
+  ssh_timeout         = var.is_windows ? null : var.communicator_timeout
+  winrm_username      = var.is_windows ? var.communicator_winrm_username : null
+  winrm_password      = var.is_windows ? var.communicator_winrm_password : null
+  winrm_host          = var.is_windows ? var.communicator_winrm_host : null
+  winrm_no_proxy      = var.is_windows ? var.communicator_winrm_no_proxy : null
+  winrm_port          = var.is_windows ? var.communicator_winrm_port : null
+  winrm_timeout       = var.is_windows ? var.communicator_winrm_timeout : null
+  winrm_use_ssl       = var.is_windows ? var.communicator_winrm_use_ssl : null
+  winrm_insecure      = var.is_windows ? var.communicator_winrm_insecure : null
+  winrm_use_ntlm      = var.is_windows ? var.communicator_winrm_use_ntlm : null
+  convert_to_template = var.common_template_conversion
+
+  storage {
+    disk_size             = var.vm_disk_size
+    disk_thin_provisioned = var.vm_disk_thin_provisioned
+  }
+
+  network_adapters {
+    network      = var.vm_vsphere_network
+    network_card = var.vm_network_card
+  }
+
+  boot_command = var.is_windows ? ["<spacebar>"] : [
+    "<up>",
+    "e",
+    "<down><down><end><wait>",
+    "text ${local.data_source_command}",
+    "<enter><wait><leftCtrlOn>x<leftCtrlOff>"
+  ]
+
+  dynamic "content_library_destination" {
+    for_each = var.common_content_name != null ? [1] : []
+    content {
+      library = var.common_content_library
+      name    = var.common_content_name
+      ovf     = var.common_content_ovf
+    }
+  }
+
+  dynamic "export" {
+    for_each = var.common_ovf_export_enabled == true ? [1] : []
+    content {
+      name  = local.vm_name
+      force = var.common_ovf_export_overwrite
+      options = [
+        "extraconfig"
+      ]
+      output_directory = local.ovf_export_path
+    }
+  }
 }
 
 source "virtualbox-iso" "template" {
@@ -145,74 +162,68 @@ source "virtualbox-iso" "template" {
   vboxmanage                = var.vm_vboxmanage
   vboxmanage_post           = var.vm_vboxmanage_post
   ssh_timeout               = "30m"
-  boot_command = [
+  boot_command = var.is_windows ? ["<spacebar>"] : [
     "<up>",
-    "<tab>",
-    "<wait>",
+    "e",
+    "<down><down><end><wait>",
     "text ${local.data_source_command}",
     "<enter><wait><leftCtrlOn>x<leftCtrlOff>"
   ]
 }
 
-source "parallels-iso" "template" {}
-
-source "vagrant" "template" {}
-
-source "qemu" "template" {}
-
-source "vagrant" "template" {}
-
-source "proxmox-iso" "template" {}
-
-source "oracle-classic" "template" {}
-
-source "openstack" "template" {}
-
-source "nutanix" "template" {}
-
-source "googlecompute" "template" {}
-
 source "digitalocean" "template" {
-  api_token = var.api_token
-  region = var.region
-  size = var.size
-  image = var.image
-  api_url = var.api_url
-  private_networking = var.private_networking
-  monitoring = var.monitoring
-  droplet_agent = var.droplet_agent
-  droplet_name = local.vm_name
-  ipv6 = var.ipv6
-  snapshot_name = var.snapshot_name
-  snapshot_regions = var.snapshot_regions
-  state_timeout = var.state_timeout
-  user_data = var.user_data
-  tags = var.tags
-  vpc_uuid = var.vpc_uuid
+  api_token               = var.api_token
+  region                  = var.region
+  size                    = var.size
+  image                   = var.image
+  api_url                 = var.api_url
+  private_networking      = var.private_networking
+  monitoring              = var.monitoring
+  droplet_agent           = var.droplet_agent
+  droplet_name            = local.vm_name
+  ipv6                    = var.ipv6
+  snapshot_name           = var.snapshot_name
+  snapshot_regions        = var.snapshot_regions
+  state_timeout           = var.state_timeout
+  user_data               = var.user_data
+  tags                    = var.tags
+  vpc_uuid                = var.vpc_uuid
   connect_with_private_ip = var.connect_with_private_ip
-  ssh_key_id = var.ssh_key_id
-  ssh_private_key_file = var.ssh_private_key_file
+  ssh_key_id              = var.ssh_key_id
+  ssh_private_key_file    = var.ssh_private_key_file
 }
 
-source "amazon-ebs" "template" {
-  access_key = var.aws_access_key
-  secret_key =  var.aws_secret_key
-  region =  "us-east-1"
-  source_ami =  "ami-fce3c696"
-  instance_type =  "t2.micro"
-  ssh_username =  "ubuntu"
-  ami_name =  "packer_AWS {{timestamp}}"
-  ami_virtualization_type = string
-  ami_users = list(string)
-  ami_groups = list(string)
-  tags = map(string)
-  communicator = var.is_windows ? "winrm" : "ssh"
-  force_deregister = true
-  winrm_insecure = var.is_windows ? true : false
-  winrm_username = var.is_windows ? "Administrator" : null
-  winrm_use_ssl = var.is_windows ? true : false
-  ssh_username         = var.is_windows ? null : "root"
-  ssh_interface        = var.is_windows ? null : "session_manager"
-  ssh_password = var.is_windows ? null : "root"
-  ssh_port = var.is_windows ? null : 22
+source "azure-arm" "template" {
+  client_id                         = var.client_id
+  client_secret                     = var.client_secret
+  storage_account                   = var.storage_account
+  subscription_id                   = var.subscription_id
+  tenant_id                         = var.tenant_id
+  managed_image_resource_group_name = var.managed_image_resource_group_name
+  user_assigned_managed_identities  = join("-", ["squad", var.os_type, var.image_sku, var.service])
+  os_type                           = var.os_type
+  image_publisher                   = var.image_publisher
+  image_offer                       = var.image_offer
+  image_sku                         = var.image_sku
+  secure_boot_enabled               = true
+  vtpm_enabled                      = true
+  communicator                      = var.is_windows ? "winrm" : "ssh"
+  ssh_proxy_host                    = var.is_windows ? null : var.communicator_proxy_host
+  ssh_proxy_port                    = var.is_windows ? null : var.communicator_proxy_port
+  ssh_proxy_username                = var.is_windows ? null : var.communicator_proxy_username
+  ssh_proxy_password                = var.is_windows ? null : var.communicator_proxy_password
+  ssh_username                      = var.is_windows ? null : var.build_username
+  ssh_password                      = var.is_windows ? null : var.build_password
+  ssh_port                          = var.is_windows ? null : var.communicator_port
+  ssh_timeout                       = var.is_windows ? null : var.communicator_timeout
+  winrm_username                    = var.is_windows ? var.communicator_winrm_username : null
+  winrm_password                    = var.is_windows ? var.communicator_winrm_password : null
+  winrm_host                        = var.is_windows ? var.communicator_winrm_host : null
+  winrm_no_proxy                    = var.is_windows ? var.communicator_winrm_no_proxy : null
+  winrm_port                        = var.is_windows ? var.communicator_winrm_port : null
+  winrm_timeout                     = var.is_windows ? var.communicator_winrm_timeout : null
+  winrm_use_ssl                     = var.is_windows ? var.communicator_winrm_use_ssl : null
+  winrm_insecure                    = var.is_windows ? var.communicator_winrm_insecure : null
+  winrm_use_ntlm                    = var.is_windows ? var.communicator_winrm_use_ntlm : null
+  azure_tags                        = var.azure_tags
 }

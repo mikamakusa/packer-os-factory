@@ -1,93 +1,93 @@
 variable "plugin" {
-  type = string
+  type        = string
   description = "Define the plugin you want to use"
 
   validation {
-    condition = contains(["virtualbox-iso", "vagrant", "vsphere-iso", "vmware-iso", "proxmox-iso", "qemu", "parallels-iso", "oracle-classic", "openstack", "nutanix", "hyperv-iso", "googlecompute", "digitalocean", "azure-arm", "amazon-ebs"], var.plugin)
+    condition     = contains(["virtualbox-iso", "vagrant", "vsphere-iso", "vmware-iso", "proxmox-iso", "qemu", "parallels-iso", "oracle-classic", "openstack", "nutanix", "hyperv-iso", "googlecompute", "digitalocean", "azure-arm", "amazon-ebs"], var.plugin)
     error_message = "Allowed values : virtualbox-iso, vagrant, vsphere-iso, vmware-iso, proxmox-iso, qemu, parallels-iso, oracle-classic, openstack, nutanix, hyperv-iso, googlecompute, digitalocean, azure-arm, amazon-ebs"
   }
 }
 
 variable "is_windows" {
-  type = bool
-  default = false
+  type        = bool
+  default     = false
   description = "Determines to set setting for Windows or Linux"
 }
 
 variable "api_token" {
-  type = string
-  default = null
+  type        = string
+  default     = null
   description = "The client TOKEN to use to access your account."
 }
 variable "region" {
-  type = string
+  type        = string
   description = "The name (or slug) of the region to launch the droplet in."
-  default = null
+  default     = null
 }
 variable "size" {
-  type = string
+  type        = string
   description = "The name (or slug) of the droplet size to use."
-  default = null
+  default     = null
 }
 variable "image" {
-  type = string
-  default = null
+  type        = string
+  default     = null
   description = "The name (or slug) of the base image to use."
 }
 variable "api_url" {
-  type = string
+  type    = string
   default = null
 }
 variable "private_networking" {
-  type = bool
+  type    = bool
   default = null
 }
 variable "monitoring" {
-  type = bool
+  type    = bool
   default = null
 }
 variable "droplet_agent" {
-  type = bool
+  type    = bool
   default = null
 }
 variable "ipv6" {
-  type = bool
+  type    = bool
   default = null
 }
 variable "snapshot_name" {
-  type = string
+  type    = string
   default = null
 }
 variable "snapshot_regions" {
-  type = list(string)
+  type    = list(string)
   default = null
 }
 variable "state_timeout" {
-  type = string
+  type    = string
   default = null
 }
 variable "user_data" {
-  type = string
+  type    = string
   default = null
 }
 variable "tags" {
-  type = list(string)
+  type    = list(string)
   default = null
 }
 variable "vpc_uuid" {
-  type = string
+  type    = string
   default = null
 }
 variable "connect_with_private_ip" {
-  type = bool
+  type    = bool
   default = null
 }
 variable "ssh_key_id" {
-  type = number
+  type    = number
   default = null
 }
 variable "ssh_private_key_file" {
-  type = string
+  type    = string
   default = null
 }
 
@@ -104,7 +104,7 @@ variable "vm_guest_os_version" {
   default = null
 }
 variable "vm_suffix" {
-  type = string
+  type    = string
   default = null
 }
 variable "vm_guest_os_type" {
@@ -389,4 +389,64 @@ variable "iso_checksum_value" {
 variable "commands_provision" {
   type    = list(string)
   default = []
+}
+
+variable "client_id" {
+  type    = string
+  default = null
+}
+variable "client_secret" {
+  type    = string
+  default = null
+}
+variable "resource_group_name" {
+  type    = string
+  default = null
+}
+variable "storage_account" {
+  type    = string
+  default = null
+}
+variable "subscription_id" {
+  type    = string
+  default = null
+}
+variable "tenant_id" {
+  type    = string
+  default = null
+}
+
+variable "managed_image_resource_group_name" {
+  type    = string
+  default = null
+}
+
+variable "os_type" {
+  type    = string
+  default = null
+}
+
+variable "image_publisher" {
+  type    = string
+  default = null
+}
+
+variable "image_offer" {
+  type    = string
+  default = null
+}
+
+variable "image_sku" {
+  type    = string
+  default = null
+}
+
+variable "azure_tags" {
+  type    = map(string)
+  default = null
+}
+
+variable "service" {
+  type    = string
+  default = null
 }
